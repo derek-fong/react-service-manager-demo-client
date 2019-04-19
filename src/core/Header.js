@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navbar } from 'react-bootstrap';
+import { Nav, Navbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 function Header() {
@@ -8,6 +8,11 @@ function Header() {
       <LinkContainer exact to="/">
         <Navbar.Brand>React Service Manager</Navbar.Brand>
       </LinkContainer>
+      <Nav className="mr-auto">
+        <LinkContainer to="/requests">
+          <Nav.Link>Request List</Nav.Link>
+        </LinkContainer>
+      </Nav>
     </Navbar>
   );
 }
