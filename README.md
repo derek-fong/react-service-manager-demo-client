@@ -1,4 +1,15 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# React Service Manager
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/derek-fong/react-service-manager-demo-client/blob/master/LICENSE)
+
+A simple service request management application, bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Quick Start
+
+1. Install Node dependencies with `npm install`.
+
+2. Run the app in development mode `npm start`. 
+
+3. Open [http://localhost:3000](http://localhost:3000) to view the app in the browser.  
 
 ## Available Scripts
 
@@ -42,27 +53,3 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
