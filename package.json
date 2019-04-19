@@ -1,20 +1,18 @@
 {
-  "name": "react-service-manager",
+  "name": "react-service-manager-demo-client",
   "version": "0.1.0",
+  "license": "MIT",
   "private": true,
-  "dependencies": {
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-scripts": "2.1.8"
-  },
   "scripts": {
-    "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "start": "react-scripts start",
+    "test": "react-scripts test"
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "author": "Derek Fong <derek.fong@health.wa.gov.au>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/derek-fong/react-service-manager-demo-client.git"
   },
   "browserslist": [
     ">0.2%",
@@ -22,14 +20,22 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "devDependencies": {
-    "@commitlint/cli": "^7.5.2",
-    "@commitlint/config-conventional": "^7.5.0",
-    "husky": "^1.3.1"
+  "eslintConfig": {
+    "extends": "react-app"
   },
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "dependencies": {
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-scripts": "2.1.8"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^7.5.2",
+    "@commitlint/config-conventional": "^7.5.0",
+    "husky": "^1.3.1"
   }
 }
