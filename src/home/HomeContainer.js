@@ -1,9 +1,13 @@
 import React, { Fragment } from 'react';
 import { Col, Container, Jumbotron, Row } from 'react-bootstrap';
 
+import './HomeContainer.css';
+import HomeCarousel from './HomeCarousel.js';
 import RequestCounter from './RequestCounter.js';
 
 function HomeContainer() {
+  document.title = 'React Service Manager';
+
   return (
     <Fragment>
       <Jumbotron>
@@ -21,6 +25,9 @@ function HomeContainer() {
           .
         </p>
       </Jumbotron>
+      <div id="home-carousel-container">
+        <HomeCarousel />
+      </div>
       <Container>
         <Row>
           <Col>
