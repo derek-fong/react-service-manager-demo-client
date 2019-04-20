@@ -134,6 +134,37 @@ class FakeApi {
   }
 
   /**
+   * Get request count by status types.
+   * Simulate delayed response by 500ms.
+   * @param {string[]} statusTypes - Request status types to count.
+   * @return {number} - Number of request(s) with status matched.
+   */
+  async getRequestCountAsync(statusTypes) {
+    return new Promise((resolve, reject) => {
+      if (
+        !(statusTypes && Array.isArray(statusTypes) && statusTypes.length > 0)
+      ) {
+        return reject(new Error('Status types invalid or undefined. '));
+      }
+
+      setTimeout(() => {
+        const requests = this.requests;
+        let requestCount = 0;
+
+        if (requests && requests.length > 0) {
+          requests.forEach(request => {
+            if (statusTypes.includes(request.status)) {
+              requestCount++;
+            }
+          });
+        }
+
+        resolve(requestCount);
+      }, 500);
+    });
+  }
+
+  /**
    * Register request.
    * Simulate delayed response by 300ms.
    * @async
