@@ -1,6 +1,6 @@
 import startCase from 'lodash.startcase';
 
-import { fakeRequests } from './seeds';
+import { fakeComments, fakeRequests } from './seeds';
 
 /**
  * @constant {string}
@@ -17,13 +17,49 @@ const fakeCreator = 'Foo Bar';
 class FakeApi {
   /**
    * Create a fake API.
+   * @param {Comment[]} comments - Sample fake comments.
    * @param {Request[]} requests - Sample fake requests.
    */
-  constructor({ requests }) {
-    // Set requests only if not already defined.
+  constructor({ comments, requests }) {
+    // Set comments and requests only if not already defined.
+    if (!(this.comments && this.comments.length > 0)) {
+      this.comments = comments;
+    }
+
     if (!(this.requests && this.requests.length > 0)) {
       this.requests = requests;
     }
+  }
+
+  /**
+   * Add comment.
+   * Simulate delayed response by 100ms.
+   * @async
+   * @param {Comment} comment - Comment to be added.
+   * @returns {Promise<string>} Comment ID.
+   */
+  async addCommentAsync(comment) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (this.isValidComment(comment)) {
+          const commentId = this.getNextCommentId();
+          const comments = this.comments;
+
+          comments.push({
+            ...comment,
+            createdAt: new Date(),
+            createdBy: fakeCreator,
+            id: commentId
+          });
+
+          this.comments = comments;
+
+          resolve(commentId);
+        } else {
+          reject(new Error('Invalid comment. '));
+        }
+      }, 100);
+    });
   }
 
   /**
@@ -36,6 +72,40 @@ class FakeApi {
     return new Promise(resolve =>
       setTimeout(() => resolve(this.requests), 500)
     );
+  }
+
+  /**
+   * Get comments by reference ID, sorted by most recent first.
+   * Simulate delayed response by 1000ms.
+   * @async
+   * @param {string} referenceId - An incident ID or request ID.
+   * @returns {Promise<Comment[]>} Comments with reference ID matched.
+   */
+  async getCommentsAsync(referenceId) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (
+          referenceId &&
+          typeof referenceId === 'string' &&
+          referenceId !== ''
+        ) {
+          const comments = this.comments.filter(
+            comment => comment.referenceId === referenceId
+          );
+
+          // REVIEW: Sorting comments by comment ID for demo purpose only; Should be sorted by `createdAt` value in PROD.
+          return comments && comments.length > 0
+            ? resolve(comments.sort((a, b) => (b.id - a.id ? 1 : -1)))
+            : reject(
+                new Error(
+                  `No comments found with reference ID "${referenceId}". `
+                )
+              );
+        } else {
+          return reject(new Error('Invalid reference ID. '));
+        }
+      }, 1000);
+    });
   }
 
   /**
@@ -86,6 +156,23 @@ class FakeApi {
 
           this.requests = requests;
 
+          // Add comments for new request.
+          this.addComment({
+            referenceId: requestId,
+            title: 'Created Request',
+            description: `${fakeCreator} created request. `,
+            createdBy: 'SYSTEM'
+          });
+
+          this.addComment({
+            referenceId: requestId,
+            title: 'Updated Status',
+            description: `Request status set as "${startCase(
+              request.status.toLowerCase()
+            )}". `,
+            createdBy: 'SYSTEM'
+          });
+
           resolve(requestId);
         } else {
           reject(new Error('Invalid request. '));
@@ -118,7 +205,7 @@ class FakeApi {
 
             const requests = this.requests;
             const previousRequest = requests[requestIndex];
-            requests[requestIndex] = {
+            const currentRequest = {
               ...request,
               createdAt: previousRequest.createdAt,
               createdBy: previousRequest.createdBy,
@@ -126,7 +213,10 @@ class FakeApi {
               updatedBy: fakeCreator
             };
 
+            requests[requestIndex] = currentRequest;
+
             this.requests = requests;
+            this.addRequestUpdateComments(previousRequest, currentRequest);
 
             resolve(this.requests[requestIndex]);
           } else {
@@ -137,6 +227,29 @@ class FakeApi {
         }
       }, 500);
     });
+  }
+
+  /**
+   * Get comments from session storage.
+   * @private
+   * @returns {Comment[]} Comments.
+   */
+  get comments() {
+    const strComments = sessionStorage.getItem('comments');
+
+    return strComments ? JSON.parse(strComments) : [];
+  }
+
+  /**
+   * Set comments to session storage.
+   * @private
+   * @param {Comment[]} comments - Comments to be updated to session storage.
+   */
+  set comments(comments) {
+    sessionStorage.setItem(
+      'comments',
+      JSON.stringify(comments && comments.length > 0 ? comments : [])
+    );
   }
 
   /**
@@ -163,6 +276,76 @@ class FakeApi {
   }
 
   /**
+   * Add comment.
+   * @private
+   * @param {Comment} comment - Comment to be added.
+   */
+  addComment(comment) {
+    const comments = this.comments;
+
+    comments.push({
+      ...comment,
+      createdAt: new Date(),
+      id: this.getNextCommentId()
+    });
+    this.comments = comments;
+  }
+
+  /**
+   * Compare request before and after update. Add comments for updated properties.
+   * @private
+   * @param {Request} previousRequest - Request before update.
+   * @param {Request} currentRequest - Request after update.
+   */
+  addRequestUpdateComments(previousRequest, currentRequest) {
+    const referenceId = currentRequest.id;
+    const createdBy = fakeCreator;
+
+    if (previousRequest.title !== currentRequest.title) {
+      this.addComment({
+        createdBy,
+        referenceId,
+        title: 'Updated Title',
+        description: `Title changed from "${previousRequest.title}" to "${
+          currentRequest.title
+        }". `
+      });
+    }
+
+    if (previousRequest.description !== currentRequest.description) {
+      this.addComment({
+        createdBy,
+        referenceId,
+        title: 'Updated Description',
+        description: `Description changed from "${
+          previousRequest.description
+        }" to "${currentRequest.description}". `
+      });
+    }
+
+    if (previousRequest.status !== currentRequest.status) {
+      this.addComment({
+        createdBy,
+        referenceId,
+        title: 'Updated Status',
+        description: `Status changed from "${startCase(
+          previousRequest.status.toLowerCase()
+        )}" to "${startCase(currentRequest.status.toLowerCase())}". `
+      });
+    }
+  }
+
+  /**
+   * Get next comment ID.
+   * @private
+   * @example `COMMENT_123`
+   * @returns {string} Next comment ID.
+   */
+  getNextCommentId() {
+    return `COMMENT_${this.comments.length + 1}`;
+  }
+
+  /**
    * Get next request ID.
    * @private
    * @example `RF_123`
@@ -170,6 +353,28 @@ class FakeApi {
    */
   getNextRequestId() {
     return `RF_${this.requests.length + 1}`;
+  }
+
+  /**
+   * Determine if comment is valid.
+   * A comment is considered valid if it contains a reference ID, title, and description.
+   * @private
+   * @param comment
+   * @returns {*|boolean|string|string}
+   */
+  isValidComment(comment) {
+    return (
+      comment &&
+      Object.prototype.hasOwnProperty.call(comment, 'referenceId') &&
+      comment.referenceId &&
+      comment.referenceId !== '' &&
+      Object.prototype.hasOwnProperty.call(comment, 'title') &&
+      comment.title &&
+      comment.title !== '' &&
+      Object.prototype.hasOwnProperty.call(comment, 'description') &&
+      comment.description &&
+      comment.description !== ''
+    );
   }
 
   /**
@@ -196,6 +401,7 @@ class FakeApi {
 }
 
 const fakeApi = new FakeApi({
+  comments: fakeComments,
   requests: fakeRequests
 });
 
