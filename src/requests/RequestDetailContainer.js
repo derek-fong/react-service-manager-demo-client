@@ -13,9 +13,10 @@ import {
 
 import RequestDetail from './RequestDetail';
 import fakeApi from '../fake-api/FakeApi';
+import CommentsContainer from '../comments/CommentsContainer';
 
 function RequestDetailContainer({ match }) {
-  // Shows an error message if route parameter does not contain a request ID.
+  // Show error alert if route parameter does not contain a request ID.
   if (
     !(
       match &&
@@ -37,7 +38,7 @@ function RequestDetailContainer({ match }) {
   }
 
   const requestId = match.params.id;
-  document.title = `${requestId} | React Service Manager`;
+  document.title = `${requestId} | Service Manager`;
 
   const [request, setRequest] = useState(undefined);
   const [error, setError] = useState(undefined);
@@ -124,6 +125,9 @@ function RequestDetailContainer({ match }) {
               onSubmitRequest={handleSubmitRequest}
             />
           </Tab>
+          <Tab eventKey="comments" title="Comments">
+            <CommentsContainer referenceId={request.id} />
+          </Tab>
         </Tabs>
       </Fragment>
     );
@@ -132,7 +136,7 @@ function RequestDetailContainer({ match }) {
   return <Container>{contentElement}</Container>;
 }
 
-RequestDetailContainer.propTypes = {
+RequestDetailContainer.propertyTypes = {
   match: PropTypes.shape({
     param: PropTypes.shape({ id: PropTypes.string })
   }).isRequired
