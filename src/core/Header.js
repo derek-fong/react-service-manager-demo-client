@@ -12,6 +12,9 @@ function Header() {
         <LinkContainer to="/requests">
           <Nav.Link>Request List</Nav.Link>
         </LinkContainer>
+        <LinkContainer to="/requests/create">
+          <Nav.Link>Create Request</Nav.Link>
+        </LinkContainer>
       </Nav>
     </Navbar>
   );
