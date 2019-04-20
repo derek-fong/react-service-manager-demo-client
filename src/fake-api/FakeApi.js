@@ -1,6 +1,13 @@
 import { fakeRequests } from './seeds';
 
 /**
+ * @constant {string}
+ * @default
+ * We are using this name as default because it sounds cool.
+ */
+const fakeCreator = 'Foo Bar';
+
+/**
  * Class simulate a fake API service.
  * Using session storage to simulate backend storage.
  * Simulate delayed CRUD operations with `setTimeout()`.
@@ -26,6 +33,98 @@ class FakeApi {
   async getAllRequestsAsync() {
     return new Promise(resolve =>
       setTimeout(() => resolve(this.requests), 500)
+    );
+  }
+
+  /**
+   * Get request by ID.
+   * Simulate delayed response by 500ms.
+   * @async
+   * @param {string} requestId - Request ID.
+   * @returns {Promise<Request>} Request with ID matched.
+   */
+  async getRequestAsync(requestId) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (requestId && typeof requestId === 'string' && requestId !== '') {
+          const request = this.requests.find(
+            request => request.id === requestId
+          );
+
+          return request
+            ? resolve(request)
+            : reject(new Error(`Request with ID "${requestId}" not found. `));
+        } else {
+          return reject(new Error('Invalid request ID. '));
+        }
+      }, 500);
+    });
+  }
+
+  /**
+   * Update request.
+   * Simulate delayed response by 500ms.
+   * @async
+   * @param {Request} request - Request to be updated.
+   * @returns {Promise<Request>} Updated request.
+   */
+  async updateRequestAsync(request) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (this.isValidRequest(request)) {
+          if (request.id) {
+            const requestIndex = this.requests.findIndex(
+              req => req.id === request.id
+            );
+
+            if (requestIndex === -1) {
+              return reject(
+                new Error(`Request with ID "${request.id}" not found. `)
+              );
+            }
+
+            const requests = this.requests;
+            const previousRequest = requests[requestIndex];
+            requests[requestIndex] = {
+              ...request,
+              createdAt: previousRequest.createdAt,
+              createdBy: previousRequest.createdBy,
+              updatedAt: new Date(),
+              updatedBy: fakeCreator
+            };
+
+            this.requests = requests;
+
+            resolve(this.requests[requestIndex]);
+          } else {
+            return reject(new Error('Invalid request ID'));
+          }
+        } else {
+          return reject(new Error('Invalid request. '));
+        }
+      }, 500);
+    });
+  }
+
+  /**
+   * Determine if request is valid.
+   * A request is considered valid if it contains a title, description and status.
+   * @private
+   * @param {Request} request - Request object to be validated.
+   * @returns {boolean} `true` if request object is valid; `false` otherwise.
+   */
+  isValidRequest(request) {
+    return (
+      request &&
+      Object.prototype.hasOwnProperty.call(request, 'title') &&
+      typeof request.title === 'string' &&
+      request.title !== '' &&
+      Object.prototype.hasOwnProperty.call(request, 'description') &&
+      typeof request.description === 'string' &&
+      request.description !== '' &&
+      Object.prototype.hasOwnProperty.call(request, 'status') &&
+      typeof request.status === 'string' &&
+      request.status !== ''
     );
   }
 
