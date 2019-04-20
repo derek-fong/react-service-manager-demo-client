@@ -1,3 +1,5 @@
+import startCase from 'lodash.startcase';
+
 import { fakeRequests } from './seeds';
 
 /**
@@ -62,6 +64,37 @@ class FakeApi {
   }
 
   /**
+   * Register request.
+   * Simulate delayed response by 300ms.
+   * @async
+   * @param {Request} request - Request to be registered.
+   * @returns {Promise<string>} Request ID.
+   */
+  async registerRequestAsync(request) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (this.isValidRequest(request)) {
+          const requestId = this.getNextRequestId();
+          const requests = this.requests;
+
+          requests.push({
+            ...request,
+            id: requestId,
+            createdAt: new Date(),
+            createdBy: fakeCreator
+          });
+
+          this.requests = requests;
+
+          resolve(requestId);
+        } else {
+          reject(new Error('Invalid request. '));
+        }
+      }, 300);
+    });
+  }
+
+  /**
    * Update request.
    * Simulate delayed response by 500ms.
    * @async
@@ -107,28 +140,6 @@ class FakeApi {
   }
 
   /**
-   * Determine if request is valid.
-   * A request is considered valid if it contains a title, description and status.
-   * @private
-   * @param {Request} request - Request object to be validated.
-   * @returns {boolean} `true` if request object is valid; `false` otherwise.
-   */
-  isValidRequest(request) {
-    return (
-      request &&
-      Object.prototype.hasOwnProperty.call(request, 'title') &&
-      typeof request.title === 'string' &&
-      request.title !== '' &&
-      Object.prototype.hasOwnProperty.call(request, 'description') &&
-      typeof request.description === 'string' &&
-      request.description !== '' &&
-      Object.prototype.hasOwnProperty.call(request, 'status') &&
-      typeof request.status === 'string' &&
-      request.status !== ''
-    );
-  }
-
-  /**
    * Get requests from session storage.
    * @private
    * @returns {Request[]} Requests from session storage.
@@ -148,6 +159,38 @@ class FakeApi {
     sessionStorage.setItem(
       'requests',
       JSON.stringify(requests && requests.length > 0 ? requests : [])
+    );
+  }
+
+  /**
+   * Get next request ID.
+   * @private
+   * @example `RF_123`
+   * @returns {string} Next request ID.
+   */
+  getNextRequestId() {
+    return `RF_${this.requests.length + 1}`;
+  }
+
+  /**
+   * Determine if request is valid.
+   * A request is considered valid if it contains a title, description and status.
+   * @private
+   * @param {Request} request - Request object to be validated.
+   * @returns {boolean} `true` if request object is valid; `false` otherwise.
+   */
+  isValidRequest(request) {
+    return (
+      request &&
+      Object.prototype.hasOwnProperty.call(request, 'title') &&
+      typeof request.title === 'string' &&
+      request.title !== '' &&
+      Object.prototype.hasOwnProperty.call(request, 'description') &&
+      typeof request.description === 'string' &&
+      request.description !== '' &&
+      Object.prototype.hasOwnProperty.call(request, 'status') &&
+      typeof request.status === 'string' &&
+      request.status !== ''
     );
   }
 }
