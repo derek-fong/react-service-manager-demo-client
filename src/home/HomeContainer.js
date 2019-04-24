@@ -32,6 +32,7 @@ function HomeContainer() {
         <Row>
           <Col>
             <RequestCounter
+              id="open-request-counter"
               headerText="Open Requests"
               linkRef="/requests"
               linkText="View Requests"
@@ -44,6 +45,7 @@ function HomeContainer() {
           </Col>
           <Col>
             <RequestCounter
+              id="completed-request-counter"
               headerText="Completed Requests"
               linkRef="/requests/create"
               linkText="Create a New Request"

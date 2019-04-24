@@ -15,7 +15,7 @@ describe('<AppRoutes />', () => {
       </MemoryRouter>
     );
 
-    expect(component.find(HomeContainer)).toHaveLength(1);
+    expect(component.exists(HomeContainer)).toBeTruthy();
   });
 
   it('shows <RequestRoutes /> for route "/requests"', () => {
@@ -25,7 +25,7 @@ describe('<AppRoutes />', () => {
       </MemoryRouter>
     );
 
-    expect(component.find(RequestRoutes)).toHaveLength(1);
+    expect(component.exists(RequestRoutes)).toBeTruthy();
   });
 
   it('shows <NotFound /> for route not defined', () => {
@@ -35,6 +35,6 @@ describe('<AppRoutes />', () => {
       </MemoryRouter>
     );
 
-    expect(component.find(NotFound)).toHaveLength(1);
+    expect(component.exists(NotFound)).toBeTruthy();
   });
 });

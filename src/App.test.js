@@ -23,10 +23,10 @@ describe('<App />', () => {
   });
 
   it('contains a <Header />', () => {
-    expect(wrapper.find(Header)).toHaveLength(1);
+    expect(wrapper.exists(Header)).toBeTruthy();
   });
 
   it('contains a <AppRoutes />', () => {
-    expect(wrapper.find(AppRoutes)).toHaveLength(1);
+    expect(wrapper.exists(AppRoutes)).toBeTruthy();
   });
 });
