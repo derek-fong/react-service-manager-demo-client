@@ -24,7 +24,7 @@ const queryGetRequests = gql`
 `;
 
 const RequestListContainer = () => (
-  <Query query={queryGetRequests}>
+  <Query query={queryGetRequests} fetchPolicy="cache-and-network">
     {({ data, error, loading }) => {
       let contentElement;
 
