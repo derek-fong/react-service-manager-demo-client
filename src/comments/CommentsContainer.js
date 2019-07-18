@@ -1,93 +1,108 @@
+import gql from 'graphql-tag';
+import has from 'has';
 import PropTypes from 'prop-types';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment } from 'react';
+import { Query } from 'react-apollo';
 import { Alert, Card, Col, ListGroup, Row, Spinner } from 'react-bootstrap';
 
 import CommentCreation from './CommentCreation';
 import CommentList from './CommentList';
-import fakeApi from '../fake-api/FakeApi';
 
-function CommentsContainer({ referenceId }) {
-  const [comments, setComments] = useState(undefined);
-  const [error, setError] = useState(undefined);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isAddingComment, setIsAddingComment] = useState(false);
-  const addCommentAsync = async comment => {
-    setIsAddingComment(true);
-    try {
-      await fakeApi.addCommentAsync({ ...comment, referenceId });
-    } catch (e) {
-      setError(e);
-    }
-    setIsAddingComment(false);
-  };
-  let contentComponent;
-
-  /**
-   * Only runs when `isAddingComment` updates.
-   * @see [React Hook: Tip: Optimizing Performance by Skipping Effects]{@link https://reactjs.org/docs/hooks-effect.html#tip-optimizing-performance-by-skipping-effects}
-   */
-  useEffect(() => {
-    (async () => {
-      setError(undefined);
-      setIsLoading(true);
-
-      try {
-        setComments(await fakeApi.getCommentsAsync(referenceId));
-      } catch (e) {
-        setError(e);
-        setComments(undefined);
+const CommentsContainer = ({ referenceId }) => {
+  const queryRequestComments = gql`
+    query RequestComments($referenceId: String!) {
+      requestComments(referenceId: $referenceId) {
+        id
+        title
+        description
+        createdAt
+        createdBy {
+          firstName
+          lastName
+        }
       }
+    }
+  `;
 
-      setIsLoading(false);
-    })();
-  }, [isAddingComment]);
+  return (
+    <Query
+      query={queryRequestComments}
+      variables={{ referenceId }}
+      fetchPolicy="cache-and-network"
+    >
+      {({ data, error, loading }) => {
+        const commentCreation = <CommentCreation referenceId={referenceId} />;
+        let contentElement;
 
-  if (isLoading) {
-    contentComponent = (
-      <Card>
-        <ListGroup variant="flush">
-          <ListGroup.Item>
-            <CommentCreation onSubmitComment={addCommentAsync} />
-          </ListGroup.Item>
-          <ListGroup.Item>
-            <Row>
-              <Col>
-                <Spinner animation="grow" role="status" variant="primary">
-                  <span className="sr-only">Loading comments...</span>
-                </Spinner>
-                <span>Loading comments...</span>
-              </Col>
-            </Row>
-          </ListGroup.Item>
-        </ListGroup>
-      </Card>
-    );
-  } else if (comments) {
-    contentComponent = (
-      <Card>
-        <ListGroup variant="flush">
-          <ListGroup.Item>
-            <CommentCreation onSubmitComment={addCommentAsync} />
-          </ListGroup.Item>
-          <ListGroup.Item>
+        if (loading) {
+          contentElement = (
             <Card>
-              <CommentList comments={comments} />
+              <ListGroup variant="flush">
+                <ListGroup.Item>{commentCreation}</ListGroup.Item>
+                <ListGroup.Item>
+                  <Row>
+                    <Col>
+                      <Spinner animation="grow" role="status" variant="primary">
+                        <span className="sr-only">Loading comments...</span>
+                      </Spinner>
+                      <span>Loading comments...</span>
+                    </Col>
+                  </Row>
+                </ListGroup.Item>
+              </ListGroup>
             </Card>
-          </ListGroup.Item>
-        </ListGroup>
-      </Card>
-    );
-  } else if (error) {
-    contentComponent = (
-      <Alert variant="danger">
-        <Alert.Heading>Failed to Load Requests</Alert.Heading>
-        <pre>{error.toString()}</pre>
-      </Alert>
-    );
-  }
+          );
+        } else {
+          if (error) {
+            contentElement = (
+              <Card>
+                <ListGroup variant="flush">
+                  <ListGroup.Item>{commentCreation}</ListGroup.Item>
+                  <ListGroup.Item>
+                    <Alert variant="danger">
+                      <Alert.Heading>Failed to Load Requests</Alert.Heading>
+                      <pre>{error.message}</pre>
+                    </Alert>
+                  </ListGroup.Item>
+                </ListGroup>
+              </Card>
+            );
+          } else {
+            if (data && has(data, 'requestComments')) {
+              const comments = data.requestComments;
 
-  return <Fragment>{contentComponent}</Fragment>;
-}
+              contentElement = (
+                <Card>
+                  <ListGroup variant="flush">
+                    <ListGroup.Item>{commentCreation}</ListGroup.Item>
+                    <ListGroup.Item>
+                      <Card>
+                        <CommentList comments={comments} />
+                      </Card>
+                    </ListGroup.Item>
+                  </ListGroup>
+                </Card>
+              );
+            } else {
+              contentElement = (
+                <Card>
+                  <ListGroup variant="flush">
+                    <ListGroup.Item>{commentCreation}</ListGroup.Item>
+                    <ListGroup.Item>
+                      <Alert variant="info">No comments (yet)!</Alert>
+                    </ListGroup.Item>
+                  </ListGroup>
+                </Card>
+              );
+            }
+          }
+        }
+
+        return <Fragment>{contentElement}</Fragment>;
+      }}
+    </Query>
+  );
+};
 
 CommentsContainer.propTypes = {
   referenceId: PropTypes.string.isRequired

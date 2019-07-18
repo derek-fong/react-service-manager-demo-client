@@ -63,6 +63,34 @@ const RequestDetail = props => {
     }
   `;
 
+  // Re-fetch request comments after updating a request.
+  const refetchComments = ({ data }) => {
+    let queriesToRefetch = [];
+
+    if (!isNewRequest && data && has(data, 'updateRequest')) {
+      const request = data.updateRequest;
+      const query = gql`
+        query RequestComments($referenceId: String!) {
+          requestComments(referenceId: $referenceId) {
+            id
+            title
+            description
+            createdAt
+            createdBy {
+              firstName
+              lastName
+            }
+          }
+        }
+      `;
+      const variables = { referenceId: request.id };
+
+      queriesToRefetch.push({ query, variables });
+    }
+
+    return queriesToRefetch;
+  };
+
   const onCompletedCallback = () => {
     if (isNewRequest) {
       props.handleRequestCreated();
@@ -72,6 +100,7 @@ const RequestDetail = props => {
   return (
     <Mutation
       mutation={isNewRequest ? createRequest : updateRequest}
+      refetchQueries={refetchComments}
       onCompleted={onCompletedCallback}
     >
       {(submitRequest, { data, error, loading }) => {
