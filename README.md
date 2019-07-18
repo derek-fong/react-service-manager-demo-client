@@ -1,4 +1,5 @@
 # React Service Manager
+
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/derek-fong/react-service-manager-demo-client/blob/master/LICENSE)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
@@ -8,9 +9,11 @@ A simple service request management application, bootstrapped with [Create React
 
 1. Install Node dependencies with `npm install`.
 
-2. Run the app in development mode `npm start`. 
+2. Add [Apollo GraphQL URI](https://www.apollographql.com/docs/react/essentials/get-started/#create-a-client) environment variable `REACT_APP_GRAPHQL_URI` on local machine, or specify the environment variable with a [`.env`](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables#adding-development-environment-variables-in-env) file in your project root directory.
 
-3. Open [http://localhost:3000](http://localhost:3000) to view the app in the browser.  
+3. Run the app in development mode `npm start`.
+
+4. Open [http://localhost:3000](http://localhost:3000) to view the app in the browser.
 
 ## Available Scripts
 
