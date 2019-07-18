@@ -48,11 +48,18 @@
     "singleQuote": true
   },
   "dependencies": {
+    "apollo-cache-inmemory": "^1.6.2",
+    "apollo-client": "^2.6.3",
+    "apollo-link-http": "^1.5.15",
     "bootstrap": "^4.3.1",
+    "graphql": "^14.4.2",
+    "graphql-tag": "^2.10.1",
+    "has": "^1.0.3",
     "lodash.startcase": "^4.4.0",
     "moment": "^2.24.0",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
+    "react-apollo": "^2.5.8",
     "react-bootstrap": "^1.0.0-beta.8",
     "react-dom": "^16.8.6",
     "react-router-bootstrap": "^0.25.0",

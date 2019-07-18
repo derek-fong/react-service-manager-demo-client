@@ -12,7 +12,9 @@ function CommentList({ comments }) {
         {moment(comment.createdAt).format('DD/MM/YYYY HH:mm')} (
         {moment(comment.createdAt).fromNow()})
       </td>
-      <td>{comment.createdBy}</td>
+      <td>
+        {comment.createdBy.firstName} {comment.createdBy.lastName}
+      </td>
     </tr>
   ));
 
@@ -36,11 +38,14 @@ CommentList.propTypes = {
     PropTypes.shape({
       title: PropTypes.string.isRequired,
       description: PropTypes.string.isRequired,
-      createdBy: PropTypes.string.isRequired,
       createdAt: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.instanceOf(Date)
-      ]).isRequired
+      ]).isRequired,
+      createdBy: PropTypes.shape({
+        firstName: PropTypes.string.isRequired,
+        lastName: PropTypes.string.isRequired
+      })
     })
   ).isRequired
 };
